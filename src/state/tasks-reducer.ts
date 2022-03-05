@@ -1,6 +1,6 @@
 import {FilterValuesType, TasksStateType, TodolistType} from '../App';
 import {v1} from 'uuid';
-import {AddTodolistAC} from "./todolists-reducer";
+import {AddTodolistAC, AddTodolistActionType, RemoveTodolistActionType} from "./todolists-reducer";
 
 export type RemoveTaskACType = {
     type: "REMOVE-TASK",
@@ -24,7 +24,9 @@ type ActionsType = RemoveTaskACType |
     AddTaskACType |
     ChangeTaskStatusACType |
     ChangeTaskTitleACType |
-    AddTodolistAC
+    AddTodolistActionType |
+    RemoveTodolistActionType
+
 
 export const tasksReducer = (state: TasksStateType, action: ActionsType) => {
     switch (action.type) {
@@ -42,8 +44,8 @@ export const tasksReducer = (state: TasksStateType, action: ActionsType) => {
             return {
                 ...state, [action.payload.todolistId]: state[action.payload.todolistId]
                     .map(m => m.id === action.payload.id
-                    ? {...m, isDone: action.payload.isDone}
-                    : {...m})
+                        ? {...m, isDone: action.payload.isDone}
+                        : {...m})
             }
         }
         case "CHANGE-TASK-TITLE": {
@@ -54,7 +56,16 @@ export const tasksReducer = (state: TasksStateType, action: ActionsType) => {
                     : {...m})
             }
         }
-case ""
+        case "ADD-TODOLIST": {
+            return {
+                ...state,[action.todolistID] : []
+            }
+        }
+        case "REMOVE-TODOLIST": {
+            let newState = {...state}
+            delete newState[action.id]
+            return newState
+        }
         default:
             throw new Error("I don't understand this type")
     }
@@ -88,9 +99,10 @@ export const ChangeTaskStatusAC = (id: string, isDone: boolean, todolistId: stri
 export const ChangeTaskTitleAC = (id: string, newTitle: string, todolistId: string) => {
     return {
         type: "CHANGE-TASK-TITLE",
-        payload:{
-            id,newTitle,todolistId
+        payload: {
+            id, newTitle, todolistId
         }
     } as const
-
 }
+
+
